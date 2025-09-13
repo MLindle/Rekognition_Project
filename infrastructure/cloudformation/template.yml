@@ -95,7 +95,7 @@ Resources:
             Resource: "arn:aws:logs:*:*:*"
 
   LambdaInvokePermissionBeta:
-    Condition: CreateLambdaCond
+    Condition: ShouldCreateLambda
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref LambdaFunctionBeta
@@ -104,7 +104,7 @@ Resources:
       #SourceArn: !GetAtt S3Bucket.Arn
 
   LambdaInvokePermissionProd:
-    Condition: CreateLambdaCond
+    Condition: ShouldCreateLambda
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref LambdaFunctionProd
