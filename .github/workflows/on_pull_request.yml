@@ -81,6 +81,8 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           S3_PATH:   ${{ secrets.S3_PATH_BETA }}
         run: |
+          sleep 30
+          done
           aws cloudformation deploy \
             --stack-name ${{ secrets.CF_STACK_NAME }} \
             --template-file infrastructure/cloudformation/template.yml \
