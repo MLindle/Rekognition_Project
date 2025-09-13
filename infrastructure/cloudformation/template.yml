@@ -66,6 +66,24 @@ Resources:
               - logs:PutLogEvents
             Resource: "arn:aws:logs:*:*:*"
 
+  LambdaInvokePermissionBeta:
+    Condition: CreateLambdaCond
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunctionBeta
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn
+
+  LambdaInvokePermissionProd:
+    Condition: CreateLambdaCond
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunctionProd
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn
+
   RekognitionPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -164,5 +182,21 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref LambdaCodeBucket
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: beta/
+            Function: !GetAtt LambdaFunctionBeta.Arn
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: prod/
+            Function: !GetAtt LambdaFunctionProd.Arn
 
   
