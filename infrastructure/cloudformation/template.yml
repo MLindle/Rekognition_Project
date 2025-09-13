@@ -33,6 +33,8 @@ Conditions:
   CreateDynamoCond: !And
     - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
     - !Not [!Equals [!Ref DynamoDBTableNameProd, ""]]
+  CreateLambdaCond:
+    - S3BucketExists: !Not [!Equals [!Ref LambdaCodeBucket, ""]]
 
 Resources:
 
@@ -77,11 +79,11 @@ Resources:
             Action:
               - rekognition:DetectLabels
               - rekognition:DetectText
-              # Add other Rekognition actions as needed
             Resource: "*"
 
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
+    Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
       Handler: lambda_function.lambda_handler
