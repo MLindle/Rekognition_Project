@@ -43,22 +43,22 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref LambdaCodeBucket
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: beta/
-            Function: !GetAtt LambdaFunctionBeta.Arn
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: prod/
-            Function: !GetAtt LambdaFunctionProd.Arn
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:Put
+      #       Filter:
+      #         S3Key:
+      #           Rules:
+      #             - Name: prefix
+      #               Value: beta/
+      #       Function: !GetAtt LambdaFunctionBeta.Arn
+      #     - Event: s3:ObjectCreated:Put
+      #       Filter:
+      #         S3Key:
+      #           Rules:
+      #             - Name: prefix
+      #               Value: prod/
+      #       Function: !GetAtt LambdaFunctionProd.Arn
 
 
   LambdaExecutionRole:
@@ -123,7 +123,6 @@ Resources:
 
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
-    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
@@ -137,7 +136,6 @@ Resources:
 
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
-    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
