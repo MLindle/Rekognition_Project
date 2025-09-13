@@ -40,29 +40,28 @@ Conditions:
 Resources:
 
   S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref LambdaCodeBucket
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: beta/
-            Function: !GetAtt LambdaFunctionBeta.Arn
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: prod/
-            Function: !GetAtt LambdaFunctionProd.Arn
+  Type: AWS::S3::Bucket
+  Properties:
+    BucketName: !Ref LambdaCodeBucket
+    NotificationConfiguration:
+      LambdaConfigurations:
+        - Event: s3:ObjectCreated:Put
+          Filter:
+            S3Key:
+              Rules:
+                - Name: prefix
+                  Value: beta/
+          Function: !GetAtt LambdaFunctionBeta.Arn
+        - Event: s3:ObjectCreated:Put
+          Filter:
+            S3Key:
+              Rules:
+                - Name: prefix
+                  Value: prod/
+          Function: !GetAtt LambdaFunctionProd.Arn
 
 
   LambdaExecutionRole:
-    DependsOn: S3Bucket
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -74,7 +73,6 @@ Resources:
             Action: sts:AssumeRole
 
   LambdaBasicExecutionPolicy:
-    DependsOn: S3Bucket
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: LambdaBasicExecution
@@ -91,27 +89,24 @@ Resources:
             Resource: "arn:aws:logs:*:*:*"
 
   LambdaInvokePermissionBeta:
-    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref LambdaFunctionBeta
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
-      SourceArn: !GetAtt S3Bucket.Arn
+      #SourceArn: !GetAtt S3Bucket.Arn
 
   LambdaInvokePermissionProd:
-    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref LambdaFunctionProd
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
-      SourceArn: !GetAtt S3Bucket.Arn
+      #SourceArn: !GetAtt S3Bucket.Arn
 
   RekognitionPolicy:
-    DependsOn: S3Bucket
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: RekognitionAccess
@@ -153,7 +148,6 @@ Resources:
         S3Key: !Ref LambdaCodeKey
 
   RekognitionTableBeta:
-    DependsOn: S3Bucket
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Ref DynamoDBTableNameBeta
@@ -169,7 +163,6 @@ Resources:
         WriteCapacityUnits: 5
 
   RekognitionTableProd:
-    DependsOn: S3Bucket
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Ref DynamoDBTableNameProd
@@ -185,7 +178,6 @@ Resources:
         WriteCapacityUnits: 5
 
   DynamoDBWritePolicy:
-    DependsOn: S3Bucket
     Condition: CreateDynamoCond
     Type: AWS::IAM::Policy
     Properties:
