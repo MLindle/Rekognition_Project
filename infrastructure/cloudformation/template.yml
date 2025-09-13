@@ -39,6 +39,28 @@ Conditions:
 
 Resources:
 
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref LambdaCodeBucket
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: beta/
+            Function: !GetAtt LambdaFunctionBeta.Arn
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: prod/
+            Function: !GetAtt LambdaFunctionProd.Arn
+
+
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -102,7 +124,6 @@ Resources:
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
     Condition: CreateLambdaCond
-    DependsOn: S3Bucket
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
       Handler: lambda_function.lambda_handler
@@ -116,7 +137,6 @@ Resources:
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
     Condition: CreateLambdaCond
-    DependsOn: S3Bucket
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
       Handler: lambda_function.lambda_handler
@@ -179,26 +199,5 @@ Resources:
               - !Sub "${RekognitionTableBeta.Arn}/index/*"
               - !GetAtt RekognitionTableProd.Arn
               - !Sub "${RekognitionTableProd.Arn}/index/*"
-
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref LambdaCodeBucket
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: beta/
-            Function: !GetAtt LambdaFunctionBeta.Arn
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: prod/
-            Function: !GetAtt LambdaFunctionProd.Arn
 
   
