@@ -127,7 +127,7 @@ Resources:
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
-      Handler: lambda_function.lambda_handler
+      Handler: analyze_image.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
       Timeout: 120
@@ -141,7 +141,7 @@ Resources:
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
-      Handler: lambda_function.lambda_handler
+      Handler: analyze_image.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
       Timeout: 120
