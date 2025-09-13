@@ -88,5 +88,5 @@ jobs:
             --parameter-overrides \
               LambdaFunctionNameBeta=${{ secrets.LAMBDA_NAME_BETA }} \
               LambdaCodeBucket=${{ secrets.S3_BUCKET }} \
-              LambdaCodeKey=${{ secrets.S3_PATH_BETA }}/function.zip \
+              LambdaCodeKey=${{ secrets.S3_PATH_BETA }}function.zip \
               DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }}
