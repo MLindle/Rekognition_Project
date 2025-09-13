@@ -94,17 +94,17 @@ Resources:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
 
-  LambdaFunctionProd:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: !Ref LambdaFunctionNameProd
-      Handler: lambda_function.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Runtime: python3.12
-      Timeout: 120
-      Code:
-        S3Bucket: !Ref LambdaCodeBucket
-        S3Key: !Ref LambdaCodeKey
+  # LambdaFunctionProd:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     FunctionName: !Ref LambdaFunctionNameProd
+  #     Handler: lambda_function.lambda_handler
+  #     Role: !GetAtt LambdaExecutionRole.Arn
+  #     Runtime: python3.12
+  #     Timeout: 120
+  #     Code:
+  #       S3Bucket: !Ref LambdaCodeBucket
+  #       S3Key: !Ref LambdaCodeKey
 
   RekognitionTableBeta:
     Type: AWS::DynamoDB::Table
