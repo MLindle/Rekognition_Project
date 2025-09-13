@@ -26,6 +26,7 @@ Parameters:
 
   DynamoDBTableNameProd:
     Type: String
+    Default: NoTableNameChosen
     Description: Table name for DynamoDB table
 
 Conditions:
