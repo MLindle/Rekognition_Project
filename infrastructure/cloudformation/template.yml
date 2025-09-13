@@ -33,7 +33,9 @@ Conditions:
   CreateDynamoCond: !And
     - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
     - !Not [!Equals [!Ref DynamoDBTableNameProd, ""]]
-  CreateLambdaCond: !Not [!Equals [!Ref LambdaCodeBucket, ""]]
+CreateLambdaCond: !And
+    - !Not [!Equals [!Ref LambdaCodeBucket, ""]]
+    - !Not [!Equals [!Ref LambdaCodeKey, ""]]
 
 Resources:
 
@@ -81,7 +83,7 @@ Resources:
 
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
-    Condition: CreateLambdaCond
+    Condition: CreateDynamoCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
       Handler: lambda_function.lambda_handler
@@ -94,6 +96,7 @@ Resources:
 
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
+    Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
       Handler: lambda_function.lambda_handler
