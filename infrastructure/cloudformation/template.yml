@@ -33,8 +33,7 @@ Conditions:
   CreateDynamoCond: !And
     - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
     - !Not [!Equals [!Ref DynamoDBTableNameProd, ""]]
-  CreateLambdaCond:
-    - !Not [!Equals [!Ref LambdaCodeBucket, ""]]
+  CreateLambdaCond: !Not [!Equals [!Ref LambdaCodeBucket, ""]]
 
 Resources:
 
