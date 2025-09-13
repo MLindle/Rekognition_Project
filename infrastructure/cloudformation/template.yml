@@ -49,40 +49,19 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref LambdaCodeBucket
-
-  BucketNotificationBeta:
-    Condition: ShouldCreateLambda
-    Type: AWS::S3::BucketNotification
-    DependsOn:
-      - LambdaInvokePermissionBeta
-    Properties:
-      Bucket: !Ref S3Bucket
       NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: beta/
-            Function: !GetAtt LambdaFunctionBeta.Arn
+        Fn::If:
+          - ShouldCreateLambda
+          - LambdaConfigurations:
+              - Event: s3:ObjectCreated:Put
+                Filter:
+                  S3Key:
+                    Rules:
+                      - Name: prefix
+                        Value: beta/
+                Function: !GetAtt LambdaFunctionBeta.Arn
+          - !Ref "AWS::NoValue"
 
-  BucketNotificationProd:
-    Condition: ShouldCreateLambda
-    Type: AWS::S3::BucketNotification
-    DependsOn:
-      - LambdaInvokePermissionProd
-    Properties:
-      Bucket: !Ref S3Bucket
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: prod/
-            Function: !GetAtt LambdaFunctionBeta.Arn
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -146,7 +125,6 @@ Resources:
 
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
-    DependsOn: S3Bucket
     Condition: ShouldCreateLambda
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
@@ -160,7 +138,6 @@ Resources:
 
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
-    DependsOn: S3Bucket
     Condition: ShouldCreateLambda
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
