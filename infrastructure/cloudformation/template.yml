@@ -62,6 +62,7 @@ Resources:
 
 
   LambdaExecutionRole:
+    DependsOn: S3Bucket
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -73,6 +74,7 @@ Resources:
             Action: sts:AssumeRole
 
   LambdaBasicExecutionPolicy:
+    DependsOn: S3Bucket
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: LambdaBasicExecution
@@ -89,6 +91,7 @@ Resources:
             Resource: "arn:aws:logs:*:*:*"
 
   LambdaInvokePermissionBeta:
+    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Type: AWS::Lambda::Permission
     Properties:
@@ -98,6 +101,7 @@ Resources:
       SourceArn: !GetAtt S3Bucket.Arn
 
   LambdaInvokePermissionProd:
+    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Type: AWS::Lambda::Permission
     Properties:
@@ -107,6 +111,7 @@ Resources:
       SourceArn: !GetAtt S3Bucket.Arn
 
   RekognitionPolicy:
+    DependsOn: S3Bucket
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: RekognitionAccess
@@ -148,6 +153,7 @@ Resources:
         S3Key: !Ref LambdaCodeKey
 
   RekognitionTableBeta:
+    DependsOn: S3Bucket
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Ref DynamoDBTableNameBeta
@@ -163,6 +169,7 @@ Resources:
         WriteCapacityUnits: 5
 
   RekognitionTableProd:
+    DependsOn: S3Bucket
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Ref DynamoDBTableNameProd
@@ -178,6 +185,7 @@ Resources:
         WriteCapacityUnits: 5
 
   DynamoDBWritePolicy:
+    DependsOn: S3Bucket
     Condition: CreateDynamoCond
     Type: AWS::IAM::Policy
     Properties:
