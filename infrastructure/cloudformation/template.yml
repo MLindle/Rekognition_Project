@@ -29,6 +29,11 @@ Parameters:
     Default: NoTableNameChosen
     Description: Table name for DynamoDB table
 
+  CreateLambda:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+
 Conditions:
   CreateDynamoCond: !And
     - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
@@ -36,6 +41,7 @@ Conditions:
   CreateLambdaCond: !And
       - !Not [!Equals [!Ref LambdaCodeBucket, ""]]
       - !Not [!Equals [!Ref LambdaCodeKey, ""]]
+  ShouldCreateLambda: !Equals [!Ref CreateLambda, "true"]
 
 Resources:
 
@@ -124,7 +130,7 @@ Resources:
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
     DependsOn: S3Bucket
-    Condition: CreateLambdaCond
+    Condition: ShouldCreateLambda
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
       Handler: analyze_image.lambda_handler
@@ -138,7 +144,7 @@ Resources:
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
     DependsOn: S3Bucket
-    Condition: CreateLambdaCond
+    Condition: ShouldCreateLambda
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
       Handler: analyze_image.lambda_handler

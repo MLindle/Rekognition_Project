@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/checkout@v5
 
-      - name: Deploy stack (creates bucket)
+      - name: Deploy stack (creates bucket only)
         run: |
           aws cloudformation deploy \
             --stack-name ${{ secrets.CF_STACK_NAME }} \
@@ -27,7 +27,8 @@ jobs:
               LambdaFunctionNameBeta=${{ secrets.LAMBDA_NAME_BETA }} \
               LambdaCodeBucket=${{ secrets.S3_BUCKET }} \
               LambdaCodeKey=${{ secrets.S3_PATH_BETA }}/function.zip \
-              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }}
+              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }} \
+              CreateLambda=false
 
       - name: Wait for S3 bucket to be created
         env:
@@ -62,4 +63,5 @@ jobs:
               LambdaFunctionNameBeta=${{ secrets.LAMBDA_NAME_BETA }} \
               LambdaCodeBucket=${{ secrets.S3_BUCKET }} \
               LambdaCodeKey=${{ secrets.S3_PATH_BETA }}/function.zip \
-              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }}
+              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }} \
+              CreateLambda=true
