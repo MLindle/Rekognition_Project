@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Lambda, S3, DynamoDB, and other resources for Rekognition project
+
+Parameters:
+  LambdaFunctionNameBeta:
+    Type: String
+    Default: Rekognition Lambda Beta
+    Description: Name for the Lambda function
+
+  LambdaFunctionNameProd:
+    Type: String
+    Default: Rekognition Lambda Prod
+    Description: Name for the Lambda function
+
+  LambdaCodeBucket:
+    Type: String
+    Description: S3 bucket where the Lambda deployment package is stored
+
+  LambdaCodeKey:
+    Type: String
+    Description: S3 key for the Lambda deployment package
+
+  DynamoDBTableNameBeta:
+    Type: String
+    Description: Table name for DynamoDB table
+
+  DynamoDBTableNameProd:
+    Type: String
+    Description: Table name for DynamoDB table
+
+Conditions:
+  CreateDynamoCond: !And
+    - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
+    - !Not [!Equals [!Ref DynamoDBTableNameProd, ""]]
+
+Resources:
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${LambdaFunction}-Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  LambdaBasicExecutionPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: LambdaBasicExecution
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: "arn:aws:logs:*:*:*"
+
+  RekognitionPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: RekognitionAccess
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - rekognition:DetectLabels
+              - rekognition:DetectText
+              # Add other Rekognition actions as needed
+            Resource: "*"
+
+  LambdaFunctionBeta:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionNameBeta
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.12
+      Timeout: 120
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Ref LambdaCodeKey
+
+  LambdaFunctionProd:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionNameProd
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.12
+      Timeout: 120
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Ref LambdaCodeKey
+
+  RekognitionTableBeta:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableNameBeta
+      AttributeDefinitions:
+        - AttributeName: Timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Timestamp
+          KeyType: HASH 
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  RekognitionTableProd:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableNameProd
+      AttributeDefinitions:
+        - AttributeName: Timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Timestamp
+          KeyType: HASH 
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  DynamoDBWritePolicy:
+    Condition: CreateDynamoCond
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: DynamoDBWriteToSpecificTable
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:BatchWriteItem
+              - dynamodb:TransactWriteItems
+              - dynamodb:DescribeTable
+            Resource:
+              - !GetAtt RekognitionTableBeta.Arn
+              - !Sub "${RekognitionTableBeta.Arn}/index/*"
+              - !GetAtt RekognitionTableProd.Arn
+              - !Sub "${RekognitionTableProd.Arn}/index/*"
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref LambdaCodeBucket
+
+  
