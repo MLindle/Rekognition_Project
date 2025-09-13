@@ -34,14 +34,13 @@ Conditions:
     - !Not [!Equals [!Ref DynamoDBTableNameBeta, ""]]
     - !Not [!Equals [!Ref DynamoDBTableNameProd, ""]]
   CreateLambdaCond:
-    - S3BucketExists: !Not [!Equals [!Ref LambdaCodeBucket, ""]]
+    - !Not [!Equals [!Ref LambdaCodeBucket, ""]]
 
 Resources:
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${LambdaFunction}-Role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -94,17 +93,17 @@ Resources:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
 
-  # LambdaFunctionProd:
-  #   Type: AWS::Lambda::Function
-  #   Properties:
-  #     FunctionName: !Ref LambdaFunctionNameProd
-  #     Handler: lambda_function.lambda_handler
-  #     Role: !GetAtt LambdaExecutionRole.Arn
-  #     Runtime: python3.12
-  #     Timeout: 120
-  #     Code:
-  #       S3Bucket: !Ref LambdaCodeBucket
-  #       S3Key: !Ref LambdaCodeKey
+  LambdaFunctionProd:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionNameProd
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.12
+      Timeout: 120
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Ref LambdaCodeKey
 
   RekognitionTableBeta:
     Type: AWS::DynamoDB::Table
