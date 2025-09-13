@@ -5,51 +5,45 @@ on:
     branches: ['main']
 
 jobs:
-
-  wait_for_s3_job:
-
-    name: Wait for S3 bucket
+  deploy_and_upload_job:
     runs-on: ubuntu-latest
     steps:
-        - name: AWS Credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id:      ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-            aws-region:             ${{ secrets.AWS_REGION }}
-        - name: Wait for S3 bucket to be created
-          env:
-            S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          run: |
-            for i in {1..30}; do
-            if aws s3api head-bucket --bucket "$S3_BUCKET" 2>/dev/null; then
-                echo "Bucket exists!"
-                exit 0
-            fi
-            echo "Waiting for bucket..."
-            sleep 10
-            done
-            echo "Bucket did not appear in time."
-            exit 1
-
-  upload_to_s3_job:
-    name: Upload lambda code to S3
-    needs: wait_for_s3_job
-    runs-on: ubuntu-latest
-    steps:
-
-      # Configure AWS credentials
-
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:      ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region:             ${{ secrets.AWS_REGION }}
-      
-      # Zip file and upload
 
       - uses: actions/checkout@v5
+
+      - name: Deploy stack (creates bucket)
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${{ secrets.CF_STACK_NAME }} \
+            --template-file infrastructure/cloudformation/template.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              LambdaFunctionNameBeta=${{ secrets.LAMBDA_NAME_BETA }} \
+              LambdaCodeBucket=${{ secrets.S3_BUCKET }} \
+              LambdaCodeKey=${{ secrets.S3_PATH_BETA }}/function.zip \
+              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }}
+
+      - name: Wait for S3 bucket to be created
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          for i in {1..30}; do
+            if aws s3api head-bucket --bucket "$S3_BUCKET" 2>/dev/null; then
+              echo "Bucket exists!"
+              exit 0
+            fi
+            echo "Waiting for bucket..."
+            sleep 10
+          done
+          echo "Bucket did not appear in time."
+          exit 1
+
       - name: Package and upload lambda code to S3
         env:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
@@ -58,30 +52,8 @@ jobs:
           zip function.zip analyze_image.py
           aws s3 cp function.zip s3://$S3_BUCKET/$S3_PATH/function.zip
 
-
-  deploy_to_beta_job:
-    name: Deploy lambda to beta environment
-    runs-on: ubuntu-latest
-    steps:
-
-      # Configure AWS credentials
-
-      - name: AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:      ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region:             ${{ secrets.AWS_REGION }}
-      
-      # Deploy to beta 
-
-      - uses: actions/checkout@v5
-      - name: Deploy lambda to beta environment
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          S3_PATH:   ${{ secrets.S3_PATH_BETA }}
+      - name: Update stack to create Lambda function
         run: |
-          sleep 30
           aws cloudformation deploy \
             --stack-name ${{ secrets.CF_STACK_NAME }} \
             --template-file infrastructure/cloudformation/template.yml \
