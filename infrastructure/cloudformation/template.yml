@@ -4,12 +4,12 @@ Description: Deploy Lambda, S3, DynamoDB, and other resources for Rekognition pr
 Parameters:
   LambdaFunctionNameBeta:
     Type: String
-    Default: Rekognition Lambda Beta
+    Default: Rekognition-Lambda-Beta
     Description: Name for the Lambda function
 
   LambdaFunctionNameProd:
     Type: String
-    Default: Rekognition Lambda Prod
+    Default: Rekognition-Lambda-Prod
     Description: Name for the Lambda function
 
   LambdaCodeBucket:
