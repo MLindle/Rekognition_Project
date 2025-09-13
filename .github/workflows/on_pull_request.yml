@@ -89,4 +89,4 @@ jobs:
               LambdaFunctionNameBeta=${{ secrets.LAMBDA_NAME_BETA }} \
               LambdaCodeBucket=${{ secrets.S3_BUCKET }} \
               LambdaCodeKey=${{ secrets.S3_PATH_BETA }}/function.zip \
-              DynamoDBTableNameBeta=${{ secrets.DYNAMODB_TABLE_NAME_BETA }}
+              DynamoDBTableNameBeta=${{ secrets.DYNAMO_DB_TABLE_BETA }}
