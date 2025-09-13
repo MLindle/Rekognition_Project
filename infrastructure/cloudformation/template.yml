@@ -123,6 +123,7 @@ Resources:
 
   LambdaFunctionBeta:
     Type: AWS::Lambda::Function
+    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameBeta
@@ -136,6 +137,7 @@ Resources:
 
   LambdaFunctionProd:
     Type: AWS::Lambda::Function
+    DependsOn: S3Bucket
     Condition: CreateLambdaCond
     Properties:
       FunctionName: !Ref LambdaFunctionNameProd
