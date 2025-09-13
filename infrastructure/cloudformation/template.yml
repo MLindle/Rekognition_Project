@@ -58,7 +58,7 @@ Resources:
                   S3Key:
                     Rules:
                       - Name: prefix
-                        Value: beta/
+                        Value: rekognition-input/beta/
                 Function: !GetAtt LambdaFunctionBeta.Arn
           - !Ref "AWS::NoValue"
 
