@@ -2,6 +2,7 @@ import os, json, urllib.parse
 from datetime import datetime
 import boto3
 import logging
+from decimal import Decimal
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -38,13 +39,13 @@ def lambda_handler(event, context):
             continue
 
         try:
-            resp = rekognition.detect_labels(
+            response = rekognition.detect_labels(
                 Image={'S3Object': {'Bucket': bucket, 'Name': key}},
                 MaxLabels=10
             )
             labels = [
-                {'Name': l['Name'], 'Confidence': l['Confidence']}
-                for l in resp.get('Labels', [])
+                {"Name": l["Name"], "Confidence": Decimal(str(l["Confidence"]))}
+                for l in response.get("Labels", [])
             ]
 
             item = {
