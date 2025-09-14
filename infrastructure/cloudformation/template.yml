@@ -133,9 +133,9 @@ Resources:
       Runtime: python3.12
       Timeout: 120
       Environment:
-      Variables:
-        DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
-        DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
+        Variables:
+          DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
+          DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
       Code:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
@@ -150,9 +150,9 @@ Resources:
       Runtime: python3.12
       Timeout: 120
       Environment:
-      Variables:
-        DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
-        DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
+        Variables:
+          DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
+          DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
       Code:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
