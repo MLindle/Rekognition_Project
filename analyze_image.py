@@ -15,11 +15,10 @@ TABLE_PROD = os.environ.get('DYNAMODB_TABLE_PROD')
 INPUT_ROOT = "rekognition-input/"
 
 def table_for_key(key: str) -> tuple[str, str] | tuple[None, None]:
-    # key like: "rekognition-input/beta/filename.jpg"
     if not key.startswith(INPUT_ROOT):
         return None, None
-    rest = key[len(INPUT_ROOT):]          # "beta/filename.jpg"
-    env  = rest.split('/', 1)[0] or ""    # "beta" | "prod"
+    rest = key[len(INPUT_ROOT):]
+    env  = rest.split('/', 1)[0] or ""
     if env == "beta":
         return "beta", TABLE_BETA
     if env == "prod":
@@ -49,7 +48,7 @@ def lambda_handler(event, context):
             ]
 
             item = {
-                'timestamp': event_time,      # DynamoDB PK (String) matches your schema
+                'timestamp': event_time,
                 'filename':  key,
                 'branch':    branch,
                 'bucket':    bucket,

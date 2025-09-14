@@ -62,6 +62,23 @@ Resources:
                 Function: !GetAtt LambdaFunctionBeta.Arn
           - !Ref "AWS::NoValue"
 
+  S3ReadImagesPolicy:
+    Condition: ShouldCreateLambda
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: S3ReadImagesForRekognition
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource:
+              - !Sub arn:aws:s3:::${LambdaCodeBucket}/rekognition-input/*
+
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
