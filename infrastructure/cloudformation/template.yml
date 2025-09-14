@@ -60,6 +60,13 @@ Resources:
                       - Name: prefix
                         Value: rekognition-input/beta/
                 Function: !GetAtt LambdaFunctionBeta.Arn
+              - Event: s3:ObjectCreated:*
+                Function: !GetAtt LambdaFunctionProd.Arn
+                Filter:
+                  S3Key:
+                    Rules:
+                      - Name: prefix
+                        Value: rekognition-input/prod/
           - !Ref "AWS::NoValue"
 
   S3ReadImagesPolicy:
