@@ -132,6 +132,10 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
       Timeout: 120
+      Environment:
+      Variables:
+        DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
+        DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
       Code:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
@@ -145,6 +149,10 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
       Timeout: 120
+      Environment:
+      Variables:
+        DYNAMODB_TABLE_BETA: !Ref DynamoDBTableNameBeta
+        DYNAMODB_TABLE_PROD: !Ref DynamoDBTableNameProd
       Code:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref LambdaCodeKey
@@ -154,10 +162,10 @@ Resources:
     Properties:
       TableName: !Ref DynamoDBTableNameBeta
       AttributeDefinitions:
-        - AttributeName: Timestamp
+        - AttributeName: timestamp
           AttributeType: S
       KeySchema:
-        - AttributeName: Timestamp
+        - AttributeName: timestamp
           KeyType: HASH 
       BillingMode: PROVISIONED
       ProvisionedThroughput:
@@ -169,10 +177,10 @@ Resources:
     Properties:
       TableName: !Ref DynamoDBTableNameProd
       AttributeDefinitions:
-        - AttributeName: Timestamp
+        - AttributeName: timestamp
           AttributeType: S
       KeySchema:
-        - AttributeName: Timestamp
+        - AttributeName: timestamp
           KeyType: HASH 
       BillingMode: PROVISIONED
       ProvisionedThroughput:
